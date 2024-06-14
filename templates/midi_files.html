@@ -1,0 +1,93 @@
+{% extends "_base.html" %}
+{% load humanize %}
+
+{% block head %}
+    {% load static %}
+    <title>Chord Wizard / MIDI files</title>
+
+{% endblock head %}
+
+
+{% block main %}
+<div class="max-w-[800px] m-auto">
+
+    <!-- Hidden Popup-->
+    <div id="creat_test_popup" class="px-8 py-4 pt-12 fixed hidden max-h-[70%] overflow-y-auto flex-col border border-slate-700 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] gap-8 shadow-xl bg-brand-dark rounded-2xl items-center z-10">
+        <button type="button" class="absolute text-slate-200 px-2 py-1 top-4 right-4 hover:bg-white/20 rounded-md" onclick="hide()">
+            <i class="fa-solid fa-x"></i>
+        </button>
+        <form method="post" enctype="multipart/form-data" class="flex flex-col gap-2 bg-brand-dark rounded-2xl m-auto">
+            {% csrf_token %}
+            <div class="">
+                {{ form.file }}
+            </div>
+            <div class="">
+                {{ form.name }}
+            </div>
+            <div class="">
+                {{ form.genere }}
+            </div>
+            <div class="">
+                {{ form.key }}
+            </div>
+            <div class="">
+                {{ form.emotion }}
+            </div>
+            <div class="flex justify-end pt-4 w-full">
+                <button class="btn-primary !font-bold" name="add_post">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Post</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <form method="post" class="flex gap-4 mt-4">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Name" class="regular-input">
+        <input type="text" name="genere" placeholder="Genere" class="regular-input">
+        <input type="text" name="key" placeholder="Key" class="regular-input">
+        <input type="text" name="emotion" placeholder="Emotion" class="regular-input">
+        <button name="filter" class="btn-secondary">Filter</button>
+    </form>
+
+    <div class="flex mt-4 justify-end">
+        <button onclick="showPopup()" class="btn-primary">
+            <span> Post New File </span> <i class="fa-solid fa-plus"></i>
+        </button>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-3 flex-wrap gap-4 mt-4">
+
+        {% for file in midi_files_list %}
+        <div class="flex flex-col gap-2 bg-brand-dark p-4 rounded-md">
+            {{ file.name }}
+            <div class="text-sm font-light">
+                <span class="text-slate-500 inline-block min-w-20 ">Genere :</span> <span>{{ file.genere }}</span>
+            </div>
+            <div class="text-sm font-light">
+                <span class="text-slate-500 inline-block min-w-20">Key :</span> <span>{{ file.key }}</span>
+            </div>
+            <div class="text-sm font-light">
+                <span class="text-slate-500 inline-block min-w-20">Emotion :</span> <span>{{ file.emotion }}</span>
+            </div>
+            <a href="{{ file.file.url }}" download class="btn-secondary !justify-center mt-2"> Download </a>
+
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+
+<script>
+    const createTestPopup = document.getElementById("creat_test_popup");
+
+    function showPopup() {
+        createTestPopup.style.display = "flex";
+    }
+    function hide() {
+        createTestPopup.style.display = "none";
+    }
+</script>
+
+{% endblock main %}

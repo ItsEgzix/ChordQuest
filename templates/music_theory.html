@@ -1,0 +1,46 @@
+{% extends "_base.html" %}
+{% load humanize %}
+{% load custom_filters %}
+
+{% block head %}
+    {% load static %}
+    <title>Chord Wizard / Music Theory</title>
+
+{% endblock head %}
+
+
+{% block main %}
+
+<div class="flex w-full">
+
+    <div class="full-height overflow-y-auto flex-1 p-8">
+        <h1 class="text-3xl mb-8 text-purple-200 ">
+            The Music Theory Of Chords: A Complete Guide
+        </h1>
+
+        {% for chapter in chapter_list %}
+        
+        <div class="bg-brand-dark p-8 rounded-xl mb-8" id="{{ chapter.id }}">
+            <h1 class="text-2xl mb-4 font-medium">
+                {{ chapter.title }}
+            </h1>
+            
+            <p class="text-lg">
+                {{ chapter.content|render_str }}
+            </p>
+        </div>
+        {% endfor %}
+        
+    </div>
+    <div class="full-height overflow-y-auto w-1/4 p-4 border-l border-slate-700">
+        {% for chapter in chapter_list %}
+        <a href="#{{ chapter.id }}"
+        class="py-3 px-6 rounded-md hover:bg-white/10 block"
+        >
+            {{ chapter.title }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock main %}

@@ -1,0 +1,103 @@
+{% extends "_base.html" %}
+
+{% comment %} {% load custom_filters %} {% endcomment %}
+
+{% block head %} 
+    {% load static %}
+
+{% endblock head %}
+
+
+{% block main %}
+
+<div class="full-height">
+    <div class="flex h-full max-w-[1600px] m-auto">
+        <div 
+        class="flex flex-col px-8 h-full justify-center gap-4
+        ">
+            <h1 class="text-2xl sm:text-4xl bg-gradient-to-r from-purple-300 to-cyan-200 bg-clip-text font-display tracking-tight text-transparent">
+            <!-- <h1 class="text-2xl sm:text-4xl bg-gradient-to-r from-red-400 to-pink2 bg-clip-text font-display tracking-tight text-transparent"> -->
+                Discover Song Chords Instantly
+            </h1>
+            <p class="my-4 text-gray-300 drop-shadow-2xl">
+                Upload Your MP3s and Find the Chords You Need
+            </p>
+        </div>
+
+
+        <div
+        class="flex w-full justify-center items-center m-8 rounded-2xl border-slate-700
+        {% if not file_path %} border-dashed border-4
+        {% else %} border-2 rounded-[1.8rem] {% endif %}
+        "
+        >
+
+            {% if file_path %}
+            <div class="relative w-full h-full flex flex-col justify-center items-center">
+                <div class="flex-1 h-full w-full">
+                    <div id="chordDisplay"
+                    class="text-7xl font-mono text-cyan-200 p-8 rounded-xl bg-purple-400/10 min-h-[4rem]">
+                    </div>
+                </div>
+                <audio id="audio" controls class=" bottom-0 left-0 w-full">
+                    <source src="{{ file_path }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+
+            </div>
+                
+            {% else %}
+            <form id="upload_form" method="post" enctype="multipart/form-data" >
+                {% csrf_token %}
+                <input type="file" id="file_upload" name="filename" hidden>
+                <label for="file_upload" class="btn-home cursor-pointer">
+                    <i class="fa-solid fa-upload mr-2"></i>
+                    Upload
+                </button>
+            </form>
+
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+
+<div class="testimonail px-0 sm:px-16 max-w-[1600px] m-auto">
+    {% include "components/_testimonial.html" %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chords = [
+            {% for chord in chords_and_timestamps %}
+            [{{ chord.0 }}, {{ chord.1 }}, '{{ chord.2 }}'],
+            {% endfor %}
+        ];
+
+        const chordDisplay = document.getElementById('chordDisplay');
+        const audio = document.getElementById('audio');
+    
+        let currentChordIndex = 0;
+    
+        audio.addEventListener('timeupdate', function() {
+            const currentTime = audio.currentTime;
+            const currentChord = chords[currentChordIndex];
+            if (currentTime >= currentChord[0] && currentTime < currentChord[1]) {
+                chordDisplay.textContent = currentChord[2];
+            } else if (currentTime >= currentChord[1] && currentChordIndex < chords.length - 1) {
+                currentChordIndex++;
+            }
+        });
+    });
+</script>
+
+<script>
+    document.getElementById('file_upload').onchange = function() {
+        document.getElementById('upload_form').submit();
+    };
+</script>
+
+
+
+{% endblock main %}

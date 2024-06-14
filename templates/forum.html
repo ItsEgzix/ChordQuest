@@ -1,0 +1,91 @@
+{% extends "_base.html" %}
+{% load humanize %}
+
+{% block head %}
+    {% load static %}
+    <title>Chord Wizard / Forums</title>
+
+{% endblock head %}
+
+
+{% block main %}
+
+<div class="flex justify-center">
+
+    <div class="p-4 w-3/5 full-height overflow-auto">
+        <form method="post" class="flex flex-col bg-brand-dark p-4 rounded-2xl m-auto">
+            {% csrf_token %}
+            <div class="[&_input]:text-xl">
+                {{ form.title }}
+            </div>
+            <div class="">
+                {{ form.init_message }}
+            </div>
+            <div class="flex justify-end pt-4 w-full">
+                <button class="btn-primary !font-bold" name="add_post">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Post</span>
+                </button>
+            </div>
+        </form>
+
+        <div class="grid grid-cols-2 gap-4 m-auto justify-center mt-4">
+            {% for post in post_list %}
+            <a href="{% url "forums" post_id=post.id %}" class="cursor-pointer bg-brand-dark p-4 rounded-xl hover:shadow-xl hover:outline outline-1 outline-slate-800 duration-700">
+                <div class="flex gap-2 text-xs text-gray-400">                    
+                    <span class="font-medium">
+                        {{ post.user }}
+                    </span>
+                    <span class="font-light">
+                        Posted {{ post.date_created|naturaltime }}
+                    </span>
+                </div>
+                <h1 class="font-medium mt-2">
+                    {{post.title}}
+                </h1>
+                <p class="font-light p-4 border border-slate-800 rounded-lg mt-2 text-justify">
+                    {{post.init_message}}
+                </p>
+            </a>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    {% if selected_post %}
+    <div class="w-2/5 flex flex-col full-height">
+        <div class="p-4 flex-1 overflow-auto">
+            <i class="fa-solid fa-comment text-4xl"></i>
+            <h1 class="text-3xl mt-4 mb-8">{{selected_post.title}}</h1>
+
+            {% for message in message_list %}
+            <div class="flex items-start gap-4 py-4 text-sm">
+                <img src="{{request.user.img.url}}" alt="" class="w-10 !aspect-square rounded-full">
+                <div class="">
+                    <div class="flex gap-2 text-gray-400 items-center mb-2">
+                        <span class="text-cyan-400 font-medium">
+                            {{ message.user }}
+                        </span>
+                        <span class="font-light text-xs">
+                            {{ message.date_created }}
+                        </span>
+                    </div>
+                    <div class=""> {{ message.content}} </div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+        <form method="post" class="w-full bottom-0 left-0 flex justify-between gap-2 items-end">
+            {% csrf_token %}
+            <textarea name="content" id="content" rows="2" class="regular-input"></textarea>
+            <button class="btn-round" name="add_message">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+
+{% endblock main %}

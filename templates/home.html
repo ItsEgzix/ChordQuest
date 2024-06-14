@@ -1,0 +1,189 @@
+{% extends "_base.html" %}
+
+{% comment %} {% load custom_filters %} {% endcomment %}
+
+{% block head %} 
+    {% load static %}
+    <title>Chord Wizard</title>
+{% endblock head %}
+
+{% block nav_logo %}
+<a href="/" class="h-full flex items-center">
+    <img src="{% static "images/logo.png" %}" alt="" class="max-h-[45%]">
+</a>
+{% comment %} <a href="/" class="h-full text-center items-center flex"> Logo </a> {% endcomment %}
+{% endblock nav_logo %}
+
+{% block main %}
+<style>
+    .box {
+        width: 100px;
+        height: 100px;
+        background-color: red;
+        position: absolute;
+    }
+    .chord {
+        cursor: pointer;
+    }
+    .remove-icon {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+        font-size: 24px;
+        color: red;
+    }
+</style>
+<div class="full-height w-full">
+    <!-- <div class="box"></div> -->
+
+    <div class="flex h-full m-auto">
+        <div 
+        class="flex flex-col px-8 h-full justify-center gap-4 w-[40%]
+        ">
+            <h1 class="text-2xl sm:text-4xl bg-gradient-to-r from-purple-300 to-cyan-200 bg-clip-text font-display tracking-tight text-transparent">
+            <!-- <h1 class="text-2xl sm:text-4xl bg-gradient-to-r from-red-400 to-pink2 bg-clip-text font-display tracking-tight text-transparent"> -->
+                AI-Powered Chord Detection 
+                {% if file_name %}
+                for {{ file_name }}
+                {% endif %}
+            </h1>
+            <p class="my-4 text-gray-300 drop-shadow-2xl">
+                Discover Song Chords Instantly Upload Your MP3s and Find the Chords You Need
+            </p>
+        </div>
+
+        <div
+        class="flex w-3/4 overflow-x-hidden justify-center items-center m-8 rounded-2xl border-slate-700
+        {% if not file_path %} border-dashed border-4
+        {% else %} border-2 rounded-[1.8rem] {% endif %}
+        "
+        >
+            {% if file_path %}
+            <div class="relative w-full h-full flex flex-col justify-center items-center">
+                <a href="/" class="remove-icon">&times;</a>
+                <div id="chordDisplay" class="flex-1 flex items-center gap-8 h-full w-full p-12 duration-200">
+                    {% for chord in chords_and_timestamps %}
+                    <div class="chord relative inline-block duration-200 transition-all text-6xl font-mono text-cyan-200 p-8 rounded-xl bg-purple-400/10">
+                        {{chord.2}}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="w-full p-4 pt-0">
+                    <audio id="audio" controls class="bottom-0 left-0 w-full">
+                        <source src="{{ file_path }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+                
+            {% else %}
+            <form id="upload_form" method="post" enctype="multipart/form-data" >
+                {% csrf_token %}
+                <input type="file" id="file_upload" name="filename" hidden>
+                <label for="file_upload" class="btn-home cursor-pointer">
+                    <i class="fa-solid fa-upload mr-2"></i>
+                    Upload
+                </label>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="testimonail px-0 sm:px-16 max-w-[1600px] m-auto">
+    {% include "components/_testimonial.html" %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chords = [
+        {% for chord in chords_and_timestamps %}
+        [{{ chord.0 }}, {{ chord.1 }}, '{{ chord.2 }}'],
+        {% endfor %}
+    ];
+
+    const chordList = document.querySelectorAll(".chord");
+    const audio = document.getElementById('audio');
+    const chordDisplay = document.getElementById('chordDisplay');
+    const removeIcon = document.querySelector('.remove-icon');
+
+    let currentChordIndex = 0;
+    let totalWidth = 0;
+
+    gsap.defaults({
+        ease: "bounce.out",
+        duration: 1,
+    });
+
+    audio.addEventListener('timeupdate', function() {
+        const currentTime = audio.currentTime;
+
+        // Find the appropriate chord index based on the current time
+        while (currentChordIndex < chords.length && currentTime > chords[currentChordIndex][1]) {
+            currentChordIndex++;
+        }
+
+        while (currentChordIndex > 0 && currentTime < chords[currentChordIndex][0]) {
+            currentChordIndex--;
+        }
+
+        // Update chord display
+        updateChordDisplay(currentChordIndex);
+    });
+
+    function updateChordDisplay(index) {
+        const currentChord = chordList[index];
+        const originalScale = 1;
+
+        if (currentChord) {
+            totalWidth = 0;
+            for (let i = 0; i < index; i++) {
+                totalWidth += chordList[i].offsetWidth + 32; // px
+            }
+
+            // Instantly set the box size
+            gsap.set(chordList, { scale: originalScale });
+            gsap.set(currentChord, { scale: 1.3 });
+
+            // Move the box
+            gsap.set(chordDisplay, { x: -totalWidth });
+        }
+    }
+
+    // Add click event listeners to each chord box
+    chordList.forEach((chordElement, index) => {
+        chordElement.addEventListener('click', () => {
+            const chordStartTime = chords[index][0];
+            audio.currentTime = chordStartTime;
+        });
+    });
+
+    document.getElementById('file_upload').onchange = function() {
+        document.getElementById('upload_form').submit();
+    };
+
+    // Remove the uploaded song and allow uploading a new one
+    if (removeIcon) {
+        removeIcon.addEventListener('click', function() {
+            window.location.href = window.location.pathname;
+        });
+    } else {
+        console.error('Remove icon not found.');
+    }
+});
+</script>
+
+
+
+<script>
+    document.getElementById('file_upload').onchange = function() {
+        document.getElementById('upload_form').submit();
+    };
+</script>
+
+
+
+{% endblock main %}
