@@ -1,2 +1,25 @@
+# Django framework
 Django>=3.2,<4.0
+
+# For handling file uploads
+django-storages
+
+# For user authentication
+django-allauth
+
+# autochord package (replace with the correct version if known)
 autochord
+
+# Additional dependencies (common in Django projects)
+psycopg2-binary  # PostgreSQL adapter (if using PostgreSQL)
+mysqlclient  # MySQL adapter (if using MySQL)
+gunicorn  # WSGI HTTP Server for UNIX
+Pillow  # Image processing
+requests  # HTTP library
+
+# For numerical computations
+numpy
+
+# Build tools
+wheel
+setuptools
