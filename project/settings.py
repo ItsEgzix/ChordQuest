@@ -17,6 +17,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 import os
 
+import environ
+
+env= environ.Env()
+environ.Env.read_env()
+
+
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -24,9 +32,9 @@ import os
 SECRET_KEY = 'django-insecure-22)t*8azk-8gocm**kp-knbx4&h)j8_z94nyk_fq=i=v6wl9fa'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['.vercel.app']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -84,13 +92,17 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
+import dj_database_url
+DATABASES={
+    'default': dj_database_url.parse(env('DATABASE_URL'))
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
