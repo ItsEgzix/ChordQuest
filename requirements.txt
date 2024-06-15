@@ -58,7 +58,6 @@ chroma-hnswlib==0.7.3
 chromadb==0.5.0
 click==8.1.7
 colorama==0.4.6
-coloredlogs==15.0.1
 command-not-found==0.3
 contourpy==1.2.1
 cryptography==3.4.8
