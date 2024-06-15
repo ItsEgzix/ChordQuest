@@ -3,7 +3,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
-from autochord import recognize
+# from autochord import recognize
 import os
 from .models import Post, Message, MidiFile, Chapter, Testimonial, Support_message
 from accounts.models import UserAccount
@@ -47,22 +47,22 @@ def home(request):
             ]
         }
 
-        if file_name in predefined_chords:
-            chords_and_timestamps = predefined_chords[file_name]
-        else:
-            chord_data = recognize(file_path)
-            chords_and_timestamps = [list(t) for t in chord_data]
-            for i, chord in enumerate(chords_and_timestamps):
-                if chord[2] == 'N':
-                    chord[2] = chords_and_timestamps[i-1][2] if i > 0 else 'N'
-                else:
-                    chord[2] = chord[2].replace(':', ' ')
+        # if file_name in predefined_chords:
+        #     chords_and_timestamps = predefined_chords[file_name]
+        # else:
+        #     chord_data = recognize(file_path)
+        #     chords_and_timestamps = [list(t) for t in chord_data]
+        #     for i, chord in enumerate(chords_and_timestamps):
+        #         if chord[2] == 'N':
+        #             chord[2] = chords_and_timestamps[i-1][2] if i > 0 else 'N'
+        #         else:
+        #             chord[2] = chord[2].replace(':', ' ')
 
-        context['chords_and_timestamps'] = chords_and_timestamps
-        context['file_path'] = file_path
-        context['file_name'] = file_name  # Pass the file name to the context
+        # context['chords_and_timestamps'] = chords_and_timestamps
+        # context['file_path'] = file_path
+        # context['file_name'] = file_name  # Pass the file name to the context
 
-        return render(request, "home.html", context)
+        # return render(request, "home.html", context)
 
     return render(request, "home.html", context)
 
