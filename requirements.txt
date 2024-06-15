@@ -6,7 +6,8 @@ django-storages
 
 # For user authentication
 django-allauth
-
+django-compressor
+whitenoise
 # autochord package (replace with the correct version if known)
 
 
