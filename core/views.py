@@ -3,7 +3,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
-# from autochord import recognize
+from autochord import recognize
 import os
 from .models import Post, Message, MidiFile, Chapter, Testimonial, Support_message
 from accounts.models import UserAccount
@@ -28,41 +28,24 @@ def home(request):
         file_name = os.path.basename(uploaded_file.name)  # Extract the file name
         time.sleep(1)
 
-        predefined_chords = {
-            "untitled_2024-06-14 22-25-41_Insert 1.mp3": [(0.0, 2.00, 'Gb min'),
-            (2.00, 3.900952380952381, 'B maj'),
-            (3.900952380952381, 5.154829931972789, 'E maj'),
-            (6.00, 7.9, 'Db min'),
-            (8.0, 9.9, 'Gb min'),
-            (10.00, 11.900952380952381, 'B maj'),
-            (11.900952380952381, 13.9, 'E maj'),
-            (14.00, 15.93, 'Db min'),
-            ],
-            "Different_Lives_FlyByMidnight.mp3": [
-                (0.0, 2.2291156462585033, 'Ab maj'),
-                (2.75, 4.73687074829932, 'Bb maj'),
-                (4.75, 6.965986394557823, 'C min'),
-                (6.75, 8.730702947845804, 'Eb maj'),
-                (8.75, 11.609977324263038, 'Db maj'),
-            ]
-        }
 
-        # if file_name in predefined_chords:
-        #     chords_and_timestamps = predefined_chords[file_name]
-        # else:
-        #     chord_data = recognize(file_path)
-        #     chords_and_timestamps = [list(t) for t in chord_data]
-        #     for i, chord in enumerate(chords_and_timestamps):
-        #         if chord[2] == 'N':
-        #             chord[2] = chords_and_timestamps[i-1][2] if i > 0 else 'N'
-        #         else:
-        #             chord[2] = chord[2].replace(':', ' ')
 
-        # context['chords_and_timestamps'] = chords_and_timestamps
-        # context['file_path'] = file_path
-        # context['file_name'] = file_name  # Pass the file name to the context
+        if file_name in predefined_chords:
+            chords_and_timestamps = predefined_chords[file_name]
+        else:
+            chord_data = recognize(file_path)
+            chords_and_timestamps = [list(t) for t in chord_data]
+            for i, chord in enumerate(chords_and_timestamps):
+                if chord[2] == 'N':
+                    chord[2] = chords_and_timestamps[i-1][2] if i > 0 else 'N'
+                else:
+                    chord[2] = chord[2].replace(':', ' ')
 
-        # return render(request, "home.html", context)
+        context['chords_and_timestamps'] = chords_and_timestamps
+        context['file_path'] = file_path
+        context['file_name'] = file_name  # Pass the file name to the context
+
+        return render(request, "home.html", context)
 
     return render(request, "home.html", context)
 
